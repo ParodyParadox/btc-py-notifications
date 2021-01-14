@@ -1,4 +1,5 @@
 import requests
+import config
 import time
 from datetime import datetime
 #EVENTS:
@@ -6,9 +7,10 @@ from datetime import datetime
 #bitcoin_price_emergency
 
 btc_price_threshhold = 10000 # set to whatever
+history_before_send = 1
 
 btc_url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
-ifttt_update_url = 'https://maker.ifttt.com/trigger/{}/with/key/UF2UaOh18WmIYh1_fQ1ko'
+ifttt_update_url = 'https://maker.ifttt.com/trigger/{}/with/key/{}'
 def get_latest_btc_price():
     parameters = {
     'id':'1',
@@ -16,7 +18,7 @@ def get_latest_btc_price():
     }
     headers = {
       'Accepts': 'application/json',
-      'X-CMC_PRO_API_KEY': '9132bf27-a483-413a-8732-2dfe8e6f3045',
+      'X-CMC_PRO_API_KEY': config.coinmarketcap_api_key,
     }
     session = requests.Session()
     session.headers.update(headers)
@@ -27,7 +29,7 @@ def get_latest_btc_price():
 
 def post_ifttt_webhook(event, value):
     data = {'value1':value}
-    ifttt_event_url = ifttt_update_url.format(event)
+    ifttt_event_url = ifttt_update_url.format(event, config.ifttt_api_key)
     requests.post(ifttt_event_url, json=data)
 
 
@@ -52,7 +54,7 @@ def main():
         if price < btc_price_threshhold:
             post_ifttt_webhook('bitcoin_price_emergency', price)
 
-        if len(bitcoin_history) == 5:
+        if len(bitcoin_history) == history_before_send:
             post_ifttt_webhook('bitcoin_price_update', format_bitcoin_history(bitcoin_history))
             bitcoin_history = []
 
