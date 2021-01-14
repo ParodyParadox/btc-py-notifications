@@ -7,7 +7,7 @@ from datetime import datetime
 #bitcoin_price_emergency
 
 btc_price_threshhold = 10000 # set to whatever
-history_before_send = 1
+history_before_send = 5
 
 btc_url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
 ifttt_update_url = 'https://maker.ifttt.com/trigger/{}/with/key/{}'
