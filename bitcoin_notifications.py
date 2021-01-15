@@ -59,41 +59,41 @@ def format_bitcoin_history(bitcoin_history):
 
 def Off():
     global run
-    global status
     status.config(text='Status: Off')
     run = False
 
 def On():
     global run
-    global status
-    run = True
-    status.config(text='Status: On')
-    threading.Thread(target=loop).start()
+    if run == False:
+        run = True
+        status.config(text='Status: On')
+        threading.Thread(target=main).start()
+    else:
+        pass
 
 def Exit():
     tk.destroy()
 
-def loop():
-    main()
-    while run == True:
-        tk.after(60000 * 5, main)
-
 def main():
-    print('running')
+    global run
     bitcoin_history = []
-    #while True:
-    price = get_latest_btc_price()
-    date = datetime.now()
-    bitcoin_history.append({'date':date, 'price':price})
+    while run:
+        print('running')
+        price = get_latest_btc_price()
+        date = datetime.now()
+        bitcoin_history.append({'date':date, 'price':price})
 
-    if price < btc_price_threshhold:
-        post_ifttt_webhook('bitcoin_price_emergency', price)
+        if price < btc_price_threshhold:
+            post_ifttt_webhook('bitcoin_price_emergency', price)
 
-    if len(bitcoin_history) == history_before_send:
-        post_ifttt_webhook('bitcoin_price_update', format_bitcoin_history(bitcoin_history))
-        bitcoin_history = []
-
-    #time.sleep(60 * 5)
+        if len(bitcoin_history) == history_before_send:
+            post_ifttt_webhook('bitcoin_price_update', format_bitcoin_history(bitcoin_history))
+            bitcoin_history = []
+        if run:
+            time.sleep(60 * 5)
+        else:
+            break
+    print('stopped')
 
 Button(tk, text='START', font='arial 16 bold', command=On, padx=10, width=12, height=5, bg='green').pack(side='left')
 Button(tk, text='STOP', font='arial 16 bold', command=Off, padx=10, width=12, height=5, bg='red').pack(side='right')
