@@ -1,29 +1,11 @@
 import requests
+from functions import *
 import config
 from tkinter import *
 import time
 from datetime import datetime
 import threading
-#EVENTS:
-#bitcoin_price_update
-#bitcoin_price_emergency
 
-tk = Tk()
-tk.geometry('500x300')
-tk.resizable(0,0)
-tk.title('Bitcoin Notification Control Panel')
-
-Label(tk, text='Control Panel', font='arial 20 bold').pack()
-status = Label(tk, text='Status: Off', font='arial 20 bold')
-status.pack(side='bottom')
-
-btc_price_threshhold = 10000 # set to whatever
-history_before_send = 5
-
-run = False
-
-btc_url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
-ifttt_update_url = 'https://maker.ifttt.com/trigger/{}/with/key/{}'
 def get_latest_btc_price():
     parameters = {
     'id':'1',
@@ -57,27 +39,6 @@ def format_bitcoin_history(bitcoin_history):
 
     return '<br>'.join(rows)
 
-def Off():
-    global run
-    global status
-    status.config(text='Status: Off')
-    run = False
-
-def On():
-    global run
-    global status
-    run = True
-    status.config(text='Status: On')
-    threading.Thread(target=loop).start()
-
-def Exit():
-    tk.destroy()
-
-def loop():
-    main()
-    while run == True:
-        tk.after(60000 * 5, main)
-
 def main():
     print('running')
     bitcoin_history = []
@@ -94,9 +55,3 @@ def main():
         bitcoin_history = []
 
     #time.sleep(60 * 5)
-
-Button(tk, text='START', font='arial 16 bold', command=On, padx=10, width=12, height=5, bg='green').pack(side='left')
-Button(tk, text='STOP', font='arial 16 bold', command=Off, padx=10, width=12, height=5, bg='red').pack(side='right')
-Button(tk, text='EXIT', font='arial 10 bold', command=Exit, padx=2, width=8, height=2, bg='ghost white').pack(side='bottom')
-
-tk.mainloop()
